@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadastro de usuário</title>
+  <style>
+    :root {
+      --bg: #f3f5f9;
+      --surface: #ffffff;
+      --ink: #1b2430;
+      --muted: #5d6b7e;
+      --accent: #1f5eff;
+      --line: #dde3ec;
+      --erro: #c62828;
+      --ok: #2e7d32;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    header { background: var(--surface); border-bottom: 1px solid var(--line); }
+    nav {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    nav strong { margin-right: auto; padding: 16px 0; }
+    nav a { color: var(--muted); text-decoration: none; padding: 8px 12px; border-radius: 6px; }
+    nav a:hover, nav a:focus-visible { color: var(--accent); background: #eef2ff; outline: none; }
+    nav a.ativo { color: var(--accent); font-weight: 600; }
+    main { max-width: 440px; margin: 0 auto; padding: 40px 20px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 28px;
+    }
+    h1 { margin: 0 0 20px; font-size: 1.6rem; }
+    label { display: block; margin: 14px 0 6px; font-weight: 600; font-size: 0.95rem; }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    input.invalido { border-color: var(--erro); }
+    .erro { color: var(--erro); font-size: 0.85rem; min-height: 1.1em; margin-top: 4px; }
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 12px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.1); }
+    #mensagem { margin-top: 16px; color: var(--ok); font-weight: 600; text-align: center; }
+    .voltar { margin-top: 16px; text-align: center; font-size: 0.95rem; }
+    .voltar a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Menu principal">
+      <strong>Meu Sistema</strong>
+      <a href="dashboard.html">Início</a>
+      <a href="cadastro.html" class="ativo">Cadastro</a>
+      <a href="index.html">Sair</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      <h1>Criar conta</h1>
+
+      <form id="cadastroForm" novalidate>
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" placeholder="Seu nome">
+        <div class="erro" id="erro-nome"></div>
+
+        <label for="email">E-mail</label>
+        <input type="email" id="email" placeholder="voce@email.com">
+        <div class="erro" id="erro-email"></div>
+
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" placeholder="Escolha um usuário">
+        <div class="erro" id="erro-usuario"></div>
+
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" placeholder="Mínimo 6 caracteres">
+        <div class="erro" id="erro-senha"></div>
+
+        <label for="confirmaSenha">Confirmar senha</label>
+        <input type="password" id="confirmaSenha" placeholder="Repita a senha">
+        <div class="erro" id="erro-confirmaSenha"></div>
+
+        <button type="submit">Cadastrar</button>
+      </form>
+
+      <div id="mensagem" role="status"></div>
+      <p class="voltar">Já tem conta? <a href="index.html">Fazer login</a></p>
+    </div>
+  </main>
+
+  <script>
+    var form = document.getElementById("cadastroForm");
+    var campos = ["nome", "email", "usuario", "senha", "confirmaSenha"];
+
+    function mostrarErro(id, texto) {
+      document.getElementById("erro-" + id).textContent = texto;
+      document.getElementById(id).classList.toggle("invalido", texto !== "");
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      campos.forEach(function (id) { mostrarErro(id, ""); });
+      document.getElementById("mensagem").textContent = "";
+
+      var nome = document.getElementById("nome").value.trim();
+      var email = document.getElementById("email").value.trim();
+      var usuario = document.getElementById("usuario").value.trim();
+      var senha = document.getElementById("senha").value;
+      var confirma = document.getElementById("confirmaSenha").value;
+      var valido = true;
+
+      if (nome === "") { mostrarErro("nome", "Informe seu nome."); valido = false; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        mostrarErro("email", "Informe um e-mail válido."); valido = false;
+      }
+      if (usuario.length < 3) {
+        mostrarErro("usuario", "O usuário deve ter ao menos 3 caracteres."); valido = false;
+      }
+      if (senha.length < 6) {
+        mostrarErro("senha", "A senha deve ter ao menos 6 caracteres."); valido = false;
+      }
+      if (confirma !== senha || confirma === "") {
+        mostrarErro("confirmaSenha", "As senhas não coincidem."); valido = false;
+      }
+
+      if (valido) {
+        document.getElementById("mensagem").textContent = "Cadastro realizado com sucesso!";
+        form.reset();
+      }
+    });
+  </script>
+</body>
+</html>
